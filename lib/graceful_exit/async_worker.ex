@@ -16,23 +16,20 @@ defmodule GracefulExit.AsyncWorker do
     {:ok, pid}
   end
 
-  def start_processing(items_to_process) when is_list(items_to_process) do
-    GenServer.cast(GracefulExit.AsyncWorker, {:start_processing, items_to_process})
-  end
-
   @impl GenServer
   def init(items_to_process) do
     Logger.info("[GracefulExit.AsyncWorker] started")
 
     Process.flag(:trap_exit, true)
 
+    Process.send_after(self(), :start_processing, 0)
+
     {:ok, items_to_process}
   end
 
   @impl GenServer
-  def handle_cast({:start_processing, items_to_process}, _state) do
+  def handle_info(:start_processing, items_to_process) do
     rest_items = process_items(items_to_process)
-    # Process.send_after(self, {:do_startprocess})
 
     {:noreply, rest_items}
   end

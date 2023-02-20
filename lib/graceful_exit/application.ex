@@ -8,12 +8,9 @@ defmodule GracefulExit.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      GracefulExit.ContinueWorker,
-      GracefulExit.AsyncWorker
+      # {GracefulExit.ContinueWorker, Enum.to_list(1..60)},
+      {GracefulExit.AsyncWorker, Enum.to_list(1..60)}
     ]
-
-    :timer.apply_after(2000, GracefulExit.ContinueWorker, :start_processing, [Enum.to_list(1..60)])
-    :timer.apply_after(2000, GracefulExit.AsyncWorker, :start_processing, [Enum.to_list(1..60)])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

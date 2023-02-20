@@ -16,22 +16,29 @@ defmodule GracefulExit.ContinueWorker do
     {:ok, pid}
   end
 
-  def start_processing(items_to_process) when is_list(items_to_process) do
-    GenServer.cast(GracefulExit.ContinueWorker, {:start_processing, items_to_process})
-  end
-
   @impl GenServer
   def init(items_to_process) do
     Logger.info("[GracefulExit.ContinueWorker] started")
 
     Process.flag(:trap_exit, true)
 
+    # send_after is used instead of return {:ok, items_to_process, {:continue, :process}}
+    # to give the GenServer time to receive `:sys.statistics` and `:sys.trace` events
+    Process.send_after(self(), :start_processing, 0)
+
     {:ok, items_to_process}
   end
 
   @impl GenServer
-  def handle_cast({:start_processing, items_to_process}, _state) do
+  def handle_info(:start_processing, items_to_process) do
+
     {:noreply, items_to_process, {:continue, :process}}
+  end
+
+  @impl GenServer
+  def handle_info(msg, state) do
+    Logger.warn("[GracefulExit.ContinueWorker] handle_info #{inspect(msg)}")
+    {:noreply, state}
   end
 
   @impl GenServer
@@ -47,12 +54,6 @@ defmodule GracefulExit.ContinueWorker do
     process_item(item)
 
     {:noreply, rest_items, {:continue, :process}}
-  end
-
-  @impl GenServer
-  def handle_info(msg, state) do
-    Logger.warn("[GracefulExit.ContinueWorker] handle_info #{inspect(msg)}")
-    {:noreply, state}
   end
 
   @impl GenServer
