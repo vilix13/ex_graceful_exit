@@ -9,7 +9,7 @@ defmodule GracefulExit.Application do
   def start(_type, _args) do
     children = [
       # {GracefulExit.ContinueWorker, Enum.to_list(1..60)},
-      # {GracefulExit.AsyncWorker, Enum.to_list(1..60)},
+      # {GracefulExit.AsyncWorker, Enum.to_list(1..60)}
       {DynamicSupervisor, strategy: :one_for_one, name: GracefulExit.ItemProcessingSupervisor}
     ]
 

@@ -13,7 +13,7 @@ Behavior on SIGTERM signal:
   - terminate callback isn't called
   - after 10 seconds (shutdown time option) exits
 
-### AsyncWorker is simple a GenServer that emulates items processing and is based on `Process.send_after()`
+### AsyncWorker is simple a GenServer that emulates items processing and is based on `Kernel.send/2`
 
 Behavior on SIGTERM signal:
   - terminate callback is called

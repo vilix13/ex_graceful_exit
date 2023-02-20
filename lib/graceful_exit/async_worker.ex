@@ -1,6 +1,6 @@
 defmodule GracefulExit.AsyncWorker do
   @moduledoc """
-  AsyncWorker is a simple GenServer that emulates items processing and is based on `Process.send_after()`
+  AsyncWorker is a simple GenServer that emulates items processing and is based on `Kernel.send/2`
 
   behavior on SIGTERM signal:
     - terminate callback is called
@@ -22,7 +22,7 @@ defmodule GracefulExit.AsyncWorker do
 
     Process.flag(:trap_exit, true)
 
-    Process.send_after(self(), :start_processing, 0)
+    send(self(), :start_processing)
 
     {:ok, items_to_process}
   end
@@ -72,7 +72,8 @@ defmodule GracefulExit.AsyncWorker do
   def process_items(items_to_process) do
     [item | rest_items] = items_to_process
     process_item(item)
-    Process.send_after(self(), :process_items, 0)
+
+    send(self(), :process_items)
 
     rest_items
   end

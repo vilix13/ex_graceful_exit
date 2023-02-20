@@ -10,10 +10,7 @@ defmodule GracefulExit.ContinueWorker do
   require Logger
 
   def start_link(args) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, args, name: GracefulExit.ContinueWorker)
-    :sys.statistics(pid, true)
-    :sys.trace(pid, true)
-    {:ok, pid}
+    GenServer.start_link(__MODULE__, args, name: GracefulExit.ContinueWorker)
   end
 
   @impl GenServer
@@ -22,9 +19,6 @@ defmodule GracefulExit.ContinueWorker do
 
     Process.flag(:trap_exit, true)
 
-    # send_after is used instead of return {:ok, items_to_process, {:continue, :process}}
-    # to give the GenServer time to receive `:sys.statistics` and `:sys.trace` events
-    Process.send_after(self(), :start_processing, 0)
 
     {:ok, items_to_process}
   end
